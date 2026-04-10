@@ -106,6 +106,30 @@
             border: 1px solid #ffb347;
         }
 
+        /* Кнопка перезапуска */
+        .btn-restart {
+            background: rgba(50, 50, 80, 0.9);
+            color: #FFD966;
+            box-shadow: 0 5px 0 #3a3a5a;
+            font-size: 1.2rem;
+            padding: 10px 24px;
+            margin-top: 16px;
+            backdrop-filter: blur(4px);
+            border: 1px solid #ffb347;
+            transition: all 0.2s;
+        }
+
+        .btn-restart:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #3a3a5a;
+        }
+
+        .restart-container {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
         .message-box {
             min-height: 110px;
             margin-top: 40px;
@@ -156,6 +180,11 @@
             animation: microShake 0.25s ease-in-out 0s 2;
         }
 
+        /* скрытый класс */
+        .hidden {
+            display: none;
+        }
+
         @media (max-width: 500px) {
             .card { padding: 28px 18px 44px; }
             .question h1 { font-size: 1.6rem; padding: 12px 18px; }
@@ -163,11 +192,12 @@
             .message-box { font-size: 1rem; }
             .btn-yes { min-width: 130px; }
             .button-area { min-height: 150px; }
+            .btn-restart { font-size: 1rem; padding: 8px 20px; }
         }
     </style>
 </head>
 <body>
-<div class="card">
+<div class="card" id="appCard">
     <div class="question">
         <h1>🎬 <span class="highlight">Лиза</span>, ты пойдёшь со мной в кино? 🍿</h1>
     </div>
@@ -180,12 +210,15 @@
     <div class="message-box" id="dynamicMessage">
         🍿 Лиза, попкорн уже ждёт! Скажи "Даа!"
     </div>
+
+    <div class="restart-container" id="restartContainer" style="display: none;">
+        <button class="btn-restart" id="restartBtn">🔄 Начать заново</button>
+    </div>
 </div>
 
 <script>
     (function() {
         // ================== ОГРОМНЫЙ СПИСОК ФРАЗ ДЛЯ КНОПКИ "НЕТ" ==================
-        // Каждый раз новая + перемежаются комплименты Лизе, которые раскрываются постепенно
         const funnyNoMessages = [
             "Кнопка 'Нет' убежала в другой кинотеатр! Жми 'Даа'!",
             "Пальчик промахнулся? Ты же самая лучшая, так что только Даа!",
@@ -238,8 +271,7 @@
             "Самая лучшая мелодия звучит, когда ты говоришь ДАА!"
         ];
         
-        // ===== ОТДЕЛЬНЫЙ МАССИВ КОМПЛИМЕНТОВ ДЛЯ ЛИЗЫ =====
-        // Они будут постепенно подмешиваться к фразам после нажатий на "Нет"
+        // ===== КОМПЛИМЕНТЫ ДЛЯ ЛИЗЫ (появляются постепенно) =====
         const lizaCompliments = [
             "Лиза, ты самая лучшая девушка в мире ✨",
             "Ты невероятно красивая, Лиза 💫",
@@ -277,9 +309,12 @@
         const noButton = document.getElementById('noBtn');
         const messageDiv = document.getElementById('dynamicMessage');
         const buttonArea = document.getElementById('buttonArea');
+        const restartContainer = document.getElementById('restartContainer');
+        const restartBtn = document.getElementById('restartBtn');
+        const card = document.getElementById('appCard');
         
         let isAnswered = false;
-        let noClickCount = 0;  // счётчик нажатий на "Нет", чтобы постепенно показывать комплименты
+        let noClickCount = 0;
 
         // Функции рандома
         function getRandomNoPhrase() {
@@ -295,20 +330,16 @@
         }
 
         // Показываем сообщение при нажатии на "Нет"
-        // Логика: через раз или с определённой вероятностью показываем комплимент Лизе
         function showNoMessage() {
             if (isAnswered) return;
             
             noClickCount++;
             let finalPhrase = "";
             
-            // Каждое 2-е или 3-е нажатие показываем комплимент (чтобы чередовалось логично)
-            // Используем остаток от деления: на 2, 3, 4 нажатиях — комплименты, но не слишком часто
+            // Каждое 3-е или 5-е нажатие — комплимент Лизе
             if (noClickCount % 3 === 0 || noClickCount % 5 === 0) {
-                // Показываем тёплые слова о Лизе
                 finalPhrase = getRandomCompliment();
             } else {
-                // Обычная смешная фраза про убегающую кнопку
                 finalPhrase = getRandomNoPhrase();
             }
             
@@ -338,7 +369,6 @@
             let randomLeft = Math.random() * (maxX - minX) + minX;
             let randomTop = Math.random() * (maxY - minY) + minY;
             
-            // Получаем координаты кнопки YES
             const yesLeft = yesButton.offsetLeft;
             const yesTop = yesButton.offsetTop;
             const yesWidth = yesButton.offsetWidth;
@@ -375,33 +405,6 @@
             if (window.navigator && window.navigator.vibrate) {
                 window.navigator.vibrate(20);
             }
-        }
-        
-        // Обработчик ДАА (позитивный финал)
-        function onYesClick(e) {
-            e.preventDefault();
-            if (isAnswered) return;
-            isAnswered = true;
-            
-            const yesPhrase = getRandomYesPhrase();
-            messageDiv.innerHTML = `🎉✨ ${yesPhrase} ✨🎉`;
-            messageDiv.classList.add('celebration-message');
-            
-            // Деактивируем кнопку НЕТ
-            noButton.disabled = true;
-            noButton.style.opacity = '0.5';
-            noButton.style.cursor = 'default';
-            noButton.removeEventListener('click', onNoClick);
-            
-            // Блокируем кнопку ДА
-            yesButton.disabled = true;
-            yesButton.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                if(yesButton) yesButton.style.transform = '';
-            }, 200);
-            
-            createCinemaConfetti();
-            document.querySelector('.card').style.boxShadow = '0 0 0 3px #FFD966, 0 30px 50px rgba(0,0,0,0.5)';
         }
         
         // Эффект конфетти
@@ -449,6 +452,84 @@
             setTimeout(() => { if(msgBox) msgBox.style.transform = ''; }, 300);
         }
         
+        // Функция полного сброса игры
+        function resetGame() {
+            // Снимаем флаг ответа
+            isAnswered = false;
+            noClickCount = 0;
+            
+            // Убираем стили празднования с карточки
+            card.style.boxShadow = '';
+            
+            // Восстанавливаем кнопки
+            noButton.disabled = false;
+            noButton.style.opacity = '1';
+            noButton.style.cursor = 'pointer';
+            noButton.style.position = '';
+            noButton.style.left = '';
+            noButton.style.top = '';
+            noButton.style.margin = '';
+            noButton.classList.remove('moving');
+            
+            yesButton.disabled = false;
+            yesButton.style.transform = '';
+            
+            // Восстанавливаем обработчик для кнопки "Нет"
+            noButton.removeEventListener('click', onNoClick);
+            noButton.addEventListener('click', onNoClick);
+            
+            // Сбрасываем сообщение
+            messageDiv.innerHTML = '🍿 Лиза, попкорн уже ждёт! Скажи "Даа!" 💫';
+            messageDiv.classList.remove('celebration-message');
+            
+            // Скрываем кнопку рестарта
+            restartContainer.style.display = 'none';
+            
+            // Небольшая задержка для плавности
+            setTimeout(() => {
+                // Убедимся, что кнопка "Нет" на месте (не убежавшая)
+                if (noButton.style.position !== 'absolute') {
+                    // уже сброшено
+                }
+            }, 50);
+        }
+        
+        // Обработчик ДАА (позитивный финал)
+        function onYesClick(e) {
+            e.preventDefault();
+            if (isAnswered) return;
+            isAnswered = true;
+            
+            const yesPhrase = getRandomYesPhrase();
+            messageDiv.innerHTML = `🎉✨ ${yesPhrase} ✨🎉`;
+            messageDiv.classList.add('celebration-message');
+            
+            // Деактивируем кнопку НЕТ
+            noButton.disabled = true;
+            noButton.style.opacity = '0.5';
+            noButton.style.cursor = 'default';
+            noButton.removeEventListener('click', onNoClick);
+            
+            // Блокируем кнопку ДА
+            yesButton.disabled = true;
+            yesButton.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                if(yesButton) yesButton.style.transform = '';
+            }, 200);
+            
+            // Показываем кнопку "Начать заново"
+            restartContainer.style.display = 'flex';
+            
+            createCinemaConfetti();
+            card.style.boxShadow = '0 0 0 3px #FFD966, 0 30px 50px rgba(0,0,0,0.5)';
+        }
+        
+        // Обработчик кнопки "Начать заново"
+        function onRestartClick(e) {
+            e.preventDefault();
+            resetGame();
+        }
+        
         // При ресайзе корректируем позицию кнопки
         function handleResize() {
             if (isAnswered) return;
@@ -457,20 +538,13 @@
             }
         }
         
-        function resetNoPosition() {
-            if (isAnswered) return;
-            noButton.style.position = '';
-            noButton.style.left = '';
-            noButton.style.top = '';
-            noButton.classList.remove('moving');
-        }
-        
+        // Регистрируем обработчики
         yesButton.addEventListener('click', onYesClick);
         noButton.addEventListener('click', onNoClick);
+        restartBtn.addEventListener('click', onRestartClick);
         window.addEventListener('resize', () => { setTimeout(handleResize, 60); });
         
-        resetNoPosition();
-        
+        // Начальное сообщение
         setTimeout(() => {
             if (!isAnswered) {
                 messageDiv.innerHTML = '🍿 Лиза, попкорн уже ждёт! Скажи "Даа!" 💫';
