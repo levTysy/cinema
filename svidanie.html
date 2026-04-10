@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Лиза, пойдём в кино? 🎬</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: radial-gradient(circle at 10% 30%, #1a1a2e, #16213e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, 'Helvetica Neue', system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 20px;
+            touch-action: pan-x pan-y;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 550px;
+            background: rgba(20, 20, 40, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 64px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.4), 0 0 0 2px rgba(255, 215, 0, 0.3) inset;
+            padding: 36px 24px 48px;
+            text-align: center;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+        }
+
+        .question h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #FFE6A7;
+            text-shadow: 0 0 8px #ff9f4a;
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+            background: rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            padding: 16px 24px;
+            border-radius: 80px;
+            backdrop-filter: blur(4px);
+        }
+
+        .question .highlight {
+            background: linear-gradient(135deg, #FFD966, #FFB347);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+
+        .button-area {
+            position: relative;
+            min-height: 180px;
+            margin: 40px 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        button {
+            border: none;
+            font-size: 1.8rem;
+            font-weight: 700;
+            padding: 16px 32px;
+            border-radius: 90px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: transform 0.08s linear, box-shadow 0.1s ease;
+            touch-action: manipulation;
+            letter-spacing: 1px;
+        }
+
+        button:active {
+            transform: translateY(3px);
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #F9D423, #F4B41A);
+            color: #2c1a0a;
+            box-shadow: 0 7px 0 #b4621a;
+            min-width: 160px;
+            font-weight: 800;
+        }
+
+        .btn-no {
+            background: #2d2a3e;
+            color: #ffbc6e;
+            box-shadow: 0 7px 0 #5a3e2e;
+            transition: all 0.2s cubic-bezier(0.2, 1.1, 0.4, 1.2);
+            position: relative;
+            z-index: 10;
+            border: 1px solid #ffb347;
+        }
+
+        .message-box {
+            min-height: 110px;
+            margin-top: 40px;
+            padding: 16px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #FFE7B0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 200, 100, 0.4);
+        }
+
+        .celebration-message {
+            background: radial-gradient(circle, #2e5a2e, #1a3f1a);
+            border-left: 6px solid #FFD966;
+            color: #FFF2CF;
+            animation: gentlePop 0.6s ease;
+            font-size: 1.3rem;
+        }
+
+        @keyframes gentlePop {
+            0% { transform: scale(0.95); opacity: 0; }
+            80% { transform: scale(1.02); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .moving {
+            position: absolute;
+            transition: all 0.18s cubic-bezier(0.2, 1.2, 0.4, 1);
+        }
+
+        @keyframes microShake {
+            0% { transform: translate(1px, 1px); }
+            25% { transform: translate(-2px, -1px); }
+            50% { transform: translate(2px, -1px); }
+            75% { transform: translate(-1px, 2px); }
+            100% { transform: translate(0,0); }
+        }
+        
+        .shake-msg {
+            animation: microShake 0.25s ease-in-out 0s 2;
+        }
+
+        @media (max-width: 500px) {
+            .card { padding: 28px 18px 44px; }
+            .question h1 { font-size: 1.6rem; padding: 12px 18px; }
+            button { font-size: 1.4rem; padding: 12px 24px; }
+            .message-box { font-size: 1rem; }
+            .btn-yes { min-width: 130px; }
+            .button-area { min-height: 150px; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="question">
+        <h1>🎬 <span class="highlight">Лиза</span>, ты пойдёшь со мной в кино? 🍿</h1>
+    </div>
+
+    <div class="button-area" id="buttonArea">
+        <button class="btn-yes" id="yesBtn">Даа! 💖</button>
+        <button class="btn-no" id="noBtn">Нет</button>
+    </div>
+
+    <div class="message-box" id="dynamicMessage">
+        🍿 Лиза, попкорн уже ждёт! Скажи "Даа!"
+    </div>
+</div>
+
+<script>
+    (function() {
+        // ================== ОГРОМНЫЙ СПИСОК ФРАЗ ДЛЯ КНОПКИ "НЕТ" ==================
+        // Каждый раз новая + перемежаются комплименты Лизе, которые раскрываются постепенно
+        const funnyNoMessages = [
+            "Кнопка 'Нет' убежала в другой кинотеатр! Жми 'Даа'!",
+            "Пальчик промахнулся? Ты же самая лучшая, так что только Даа!",
+            "Не-а, не катит! Даже звёзды хотят, чтобы ты сказала ДА!",
+            "Лиза, отказ не принимается. Жми золотую кнопку!",
+            "Кнопка 'Нет' сегодня очень стеснительная. Давай честно: ДАА!",
+            "Отказ = грустный попкорн. А с 'ДА' будет веселье!",
+            "Упс! Кнопка ускакала в мультивселенную. Вернись к золотой!",
+            "Ты случайно нажала на 'Нет'? Но ты же королева, королевы говорят ДА!",
+            "Лиза, 'Нет' ведёт к скучному вечеру. 'ДАА' — к морю эмоций!",
+            "Даже звёзды шепчут: Лиза, нажми на ДАА!",
+            "Кнопка 'Нет' испугалась твоей красоты! Жми на ДА!",
+            "Я вижу, тебе нравится ловить кнопку? Но ответ всё равно ДАА!",
+            "Сервер любви вернул ошибку: 'Нет' не найдено. Только ДА!",
+            "Эхо правильного ответа: Дааааа! Попробуй еще раз, Лиза!",
+            "Кнопка Нет убежала, потому что знает: ты достойна лучшего фильма!",
+            "Лиза, даже физики подтвердят: ДА = счастье в квадрате!",
+            "Режиссёр твоей жизни советует: выбери сцену 'Свидание в кино'!",
+            "Попкорн обидится, если ты скажешь 'Нет'. Не обижай попкорн!",
+            "Лиза, одна кнопка ведёт в кино, другая — в скуку. Выбирай!",
+            "Даже доктор Стрейндж увидел миллион вариантов — все с твоим ДА!",
+            "Твой смех стоит миллион, не позволяй 'Нет' украсть этот вечер!",
+            "Конфетка за ДА? А за Нет — только грусть. Жми на золотую!",
+            "Лиза, ты суперзвезда, а звёзды не говорят 'Нет' свиданиям!",
+            "Представь: торт, кино и обнимашки. Это 'ДАА'!",
+            "Твоя улыбка растопит любой лёд, а кнопка 'Нет' тает от счастья, когда ты жмёшь ДА!",
+            "Самая красивая девушка заслуживает лучшее кино. Скажи ДА!",
+            "Проектор показывает фильм 'Идеальный вечер', главная роль — твоя!",
+            "Шоколадка и попкорн уже упакованы. Чего не хватает? Твоего ДА!",
+            "Лиза, для тебя приготовлен сюрприз, но откроется только при нажатии 'ДАА'!",
+            "Танцуй со мной в кино? Для этого надо нажать зелёную кнопку!",
+            "Каждая звезда на небе хочет, чтобы мы пошли в кино. Не спорь со звездами!",
+            "Волшебная палочка говорит: 'ДАА сделает вечер незабываемым!'",
+            "Даже мой кот одобряет ДАА, а он очень разборчив!",
+            "Валентинка с предсказанием: 'Сегодня Лизе суждено сказать ДАА'",
+            "Микрофон передаёт: зал ждёт твоего 'ДАА'!",
+            "Время не ждёт, а кнопка 'Нет' всё убегает. Сдайся и жми ДАА!",
+            "Лиза, ты победительница в номинации 'Лучшая девушка' — приз: свидание в кино!",
+            "Я написал уже много открыток, но все они ведут к кнопке ДАА!",
+            "Ты — шедевр, а шедевры не говорят 'Нет' приглашениям!",
+            "Радуга цветов только для тех, кто выбирает ДАА!",
+            "Плюшевый мишка плачет, если ты нажимаешь 'Нет'. Пожалей мишку!",
+            "Представь, что кинотеатр — это райский остров. Билет = ДАА!",
+            "Ты сияешь ярче всех звёзд. А звёзды всегда говорят ДАА приключениям!",
+            "Ты великолепна! Не порти вечер кнопкой 'Нет'!",
+            "Твой танец заставит всех аплодировать, если ты выберешь ДАА!",
+            "Жизнь — театр, а в хорошей пьесе всегда есть ДАА!",
+            "Абракадабра! Превращаю 'Нет' в 'ДАА' одним щелчком!",
+            "Твой счастливый билет — это кнопка 'ДАА'!",
+            "Самая лучшая мелодия звучит, когда ты говоришь ДАА!"
+        ];
+        
+        // ===== ОТДЕЛЬНЫЙ МАССИВ КОМПЛИМЕНТОВ ДЛЯ ЛИЗЫ =====
+        // Они будут постепенно подмешиваться к фразам после нажатий на "Нет"
+        const lizaCompliments = [
+            "Лиза, ты самая лучшая девушка в мире ✨",
+            "Ты невероятно красивая, Лиза 💫",
+            "Лиза, ты прекрасна, как утренняя звезда 🌟",
+            "Ты — самое лучшее, что есть в этой вселенной 💖",
+            "Лиза, твоя улыбка освещает всё вокруг ☀️",
+            "Ты — королева моего сердца, Лиза 👑",
+            "Лиза, с каждым мгновением ты становишься ещё прекраснее 🌸",
+            "Ты — мечта, которая стала реальностью, Лиза 💭",
+            "Лиза, твои глаза сияют ярче всех звёзд ✨",
+            "Ты — идеал красоты, Лиза 💎",
+            "Лиза, ты заставляешь мир вращаться быстрее 🎠",
+            "Твоя душа так же красива, как и лицо, Лиза 🌺",
+            "Лиза, ты достойна всех цветов этой планеты 🌹",
+            "С тобой каждый день становится праздником, Лиза 🎉",
+            "Лиза, ты — лучшее, что случалось в моей жизни 💕"
+        ];
+        
+        // Праздничные фразы для варианта "ДАА"
+        const yesMessages = [
+            "УРААА, ЛИЗА СКАЗАЛА ДАА! 🎉 Готовься к невероятному киновечеру! 🍿",
+            "ОГО! Согласие самой лучшей девушки! Забираю билеты! 🎬",
+            "Лиза, ты сделала меня счастливейшим человеком! Жди романтику! 💫",
+            "Ты — королева! Свидание в кино будет легендарным! 🎥",
+            "ДААА! Сердце поёт! Лиза, ты невероятна! Выбирай любой фильм! 💖",
+            "Идеальный выбор! Лиза, спасибо! Организую лучший вечер! 🔥",
+            "Ты — мечта! Кино, попкорн и твоя улыбка — что ещё нужно для счастья? 🎈",
+            "Ура! Лиза согласилась! Бегу покупать самые вкусные сладости! 🍬",
+            "Твоё 'ДАА' звучит как самая красивая музыка! Жди сюрприз! 🎁",
+            "Лиза, ты — бриллиант! Спасибо за согласие, будет незабываемо! 💃"
+        ];
+
+        // DOM элементы
+        const yesButton = document.getElementById('yesBtn');
+        const noButton = document.getElementById('noBtn');
+        const messageDiv = document.getElementById('dynamicMessage');
+        const buttonArea = document.getElementById('buttonArea');
+        
+        let isAnswered = false;
+        let noClickCount = 0;  // счётчик нажатий на "Нет", чтобы постепенно показывать комплименты
+
+        // Функции рандома
+        function getRandomNoPhrase() {
+            return funnyNoMessages[Math.floor(Math.random() * funnyNoMessages.length)];
+        }
+        
+        function getRandomCompliment() {
+            return lizaCompliments[Math.floor(Math.random() * lizaCompliments.length)];
+        }
+        
+        function getRandomYesPhrase() {
+            return yesMessages[Math.floor(Math.random() * yesMessages.length)];
+        }
+
+        // Показываем сообщение при нажатии на "Нет"
+        // Логика: через раз или с определённой вероятностью показываем комплимент Лизе
+        function showNoMessage() {
+            if (isAnswered) return;
+            
+            noClickCount++;
+            let finalPhrase = "";
+            
+            // Каждое 2-е или 3-е нажатие показываем комплимент (чтобы чередовалось логично)
+            // Используем остаток от деления: на 2, 3, 4 нажатиях — комплименты, но не слишком часто
+            if (noClickCount % 3 === 0 || noClickCount % 5 === 0) {
+                // Показываем тёплые слова о Лизе
+                finalPhrase = getRandomCompliment();
+            } else {
+                // Обычная смешная фраза про убегающую кнопку
+                finalPhrase = getRandomNoPhrase();
+            }
+            
+            messageDiv.innerHTML = `😄 ${finalPhrase}`;
+            messageDiv.classList.remove('celebration-message');
+            messageDiv.classList.add('shake-msg');
+            setTimeout(() => messageDiv.classList.remove('shake-msg'), 300);
+        }
+        
+        // Логика перемещения кнопки "Нет"
+        function moveNoButton() {
+            if (isAnswered) return;
+            
+            const containerRect = buttonArea.getBoundingClientRect();
+            const noWidth = noButton.offsetWidth;
+            const noHeight = noButton.offsetHeight;
+            const containerWidth = containerRect.width;
+            const containerHeight = containerRect.height;
+            
+            const minX = 8;
+            const maxX = containerWidth - noWidth - 8;
+            const minY = 8;
+            const maxY = containerHeight - noHeight - 8;
+            
+            if (maxX < minX || maxY < minY) return;
+            
+            let randomLeft = Math.random() * (maxX - minX) + minX;
+            let randomTop = Math.random() * (maxY - minY) + minY;
+            
+            // Получаем координаты кнопки YES
+            const yesLeft = yesButton.offsetLeft;
+            const yesTop = yesButton.offsetTop;
+            const yesWidth = yesButton.offsetWidth;
+            const yesHeight = yesButton.offsetHeight;
+            const minDistance = 20;
+            
+            function isTooClose(x1, y1, w1, h1, x2, y2, w2, h2, margin) {
+                return !(x1 + w1 + margin < x2 || x2 + w2 + margin < x1 || y1 + h1 + margin < y2 || y2 + h2 + margin < y1);
+            }
+            
+            let attempts = 0;
+            while (isTooClose(randomLeft, randomTop, noWidth, noHeight, yesLeft, yesTop, yesWidth, yesHeight, minDistance) && attempts < 40) {
+                randomLeft = Math.random() * (maxX - minX) + minX;
+                randomTop = Math.random() * (maxY - minY) + minY;
+                attempts++;
+            }
+            
+            noButton.style.position = 'absolute';
+            noButton.style.left = randomLeft + 'px';
+            noButton.style.top = randomTop + 'px';
+            noButton.style.margin = '0';
+            noButton.classList.add('moving');
+            noButton.style.zIndex = '20';
+            noButton.style.transform = 'scale(0.97)';
+            setTimeout(() => { if(noButton) noButton.style.transform = ''; }, 120);
+        }
+        
+        // Обработчик НЕТ
+        function onNoClick(e) {
+            e.preventDefault();
+            if (isAnswered) return;
+            showNoMessage();
+            moveNoButton();
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(20);
+            }
+        }
+        
+        // Обработчик ДАА (позитивный финал)
+        function onYesClick(e) {
+            e.preventDefault();
+            if (isAnswered) return;
+            isAnswered = true;
+            
+            const yesPhrase = getRandomYesPhrase();
+            messageDiv.innerHTML = `🎉✨ ${yesPhrase} ✨🎉`;
+            messageDiv.classList.add('celebration-message');
+            
+            // Деактивируем кнопку НЕТ
+            noButton.disabled = true;
+            noButton.style.opacity = '0.5';
+            noButton.style.cursor = 'default';
+            noButton.removeEventListener('click', onNoClick);
+            
+            // Блокируем кнопку ДА
+            yesButton.disabled = true;
+            yesButton.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                if(yesButton) yesButton.style.transform = '';
+            }, 200);
+            
+            createCinemaConfetti();
+            document.querySelector('.card').style.boxShadow = '0 0 0 3px #FFD966, 0 30px 50px rgba(0,0,0,0.5)';
+        }
+        
+        // Эффект конфетти
+        function createCinemaConfetti() {
+            const symbols = ['🍿', '💖', '🎬', '✨', '⭐', '💫', '🎟️', '🍭', '🎈'];
+            for (let i = 0; i < 60; i++) {
+                const conf = document.createElement('div');
+                const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+                conf.textContent = symbol;
+                conf.style.position = 'fixed';
+                conf.style.fontSize = (Math.random() * 20 + 16) + 'px';
+                conf.style.left = '50%';
+                conf.style.top = '50%';
+                conf.style.pointerEvents = 'none';
+                conf.style.zIndex = '9999';
+                conf.style.opacity = '0.9';
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 4 + Math.random() * 10;
+                const vx = Math.cos(angle) * speed;
+                let vy = Math.sin(angle) * speed - 6;
+                let posX = window.innerWidth / 2;
+                let posY = window.innerHeight / 2;
+                conf.style.transform = 'translate(-50%, -50%)';
+                document.body.appendChild(conf);
+                function animate() {
+                    posX += vx;
+                    posY += vy;
+                    vy += 0.25;
+                    let opacity = parseFloat(conf.style.opacity);
+                    opacity -= 0.015;
+                    conf.style.left = posX + 'px';
+                    conf.style.top = posY + 'px';
+                    conf.style.opacity = opacity;
+                    if (opacity <= 0 || posY > window.innerHeight + 100) {
+                        conf.remove();
+                        return;
+                    }
+                    requestAnimationFrame(animate);
+                }
+                requestAnimationFrame(animate);
+            }
+            const msgBox = document.getElementById('dynamicMessage');
+            msgBox.style.transition = '0.2s';
+            msgBox.style.transform = 'scale(1.02)';
+            setTimeout(() => { if(msgBox) msgBox.style.transform = ''; }, 300);
+        }
+        
+        // При ресайзе корректируем позицию кнопки
+        function handleResize() {
+            if (isAnswered) return;
+            if (noButton.style.position === 'absolute') {
+                moveNoButton();
+            }
+        }
+        
+        function resetNoPosition() {
+            if (isAnswered) return;
+            noButton.style.position = '';
+            noButton.style.left = '';
+            noButton.style.top = '';
+            noButton.classList.remove('moving');
+        }
+        
+        yesButton.addEventListener('click', onYesClick);
+        noButton.addEventListener('click', onNoClick);
+        window.addEventListener('resize', () => { setTimeout(handleResize, 60); });
+        
+        resetNoPosition();
+        
+        setTimeout(() => {
+            if (!isAnswered) {
+                messageDiv.innerHTML = '🍿 Лиза, попкорн уже ждёт! Скажи "Даа!" 💫';
+            }
+        }, 400);
+    })();
+</script>
+</body>
+</html>
